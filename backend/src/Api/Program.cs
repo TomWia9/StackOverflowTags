@@ -1,41 +1,48 @@
+using Api.Endpoints;
+using Application;
+using Application.Tags.Commands;
+using Infrastructure;
+using Infrastructure.Persistence;
+using MediatR;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
+
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(opt =>
+    opt.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Run EF migrations and ensure tags loaded
+await using (var scope = app.Services.CreateAsyncScope())
 {
-    app.MapOpenApi();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.EnsureCreatedAsync();
+
+    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+    await mediator.Send(new EnsureTagsLoadedCommand());
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
 
-var summaries = new[]
+app.MapOpenApi();
+
+// Scalar UI (/scalar)
+app.MapScalarApiReference(opt =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    opt.Title = "Stack Overflow Tags API";
+    opt.Theme = ScalarTheme.DeepSpace;
+});
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+app.MapTagsEndpoints();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+// Expose for integration tests
+public partial class Program;
