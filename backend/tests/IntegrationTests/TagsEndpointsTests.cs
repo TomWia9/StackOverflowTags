@@ -1,9 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Application.Common;
-using Application.Tags.Commands;
 using Application.Tags.Dtos;
-using Application.Tags.Queries;
 using FluentAssertions;
 using Xunit;
 
@@ -21,7 +19,7 @@ public sealed class TagsEndpointsTests : IClassFixture<ApiFactory>
         _client = factory.CreateClient();
     }
 
-    // ── GET /api/tags ──────────────────────────────────────────────────────
+    // GET /api/tags 
 
     [Fact]
     public async Task GET_Tags_Returns200()
@@ -100,7 +98,7 @@ public sealed class TagsEndpointsTests : IClassFixture<ApiFactory>
         total.Should().BeApproximately(100.0, 0.01);
     }
 
-    // ── Validation errors ──────────────────────────────────────────────────
+    // Validation errors
 
     [Fact]
     public async Task GET_Tags_InvalidPage_Returns400()
@@ -130,7 +128,7 @@ public sealed class TagsEndpointsTests : IClassFixture<ApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    // ── POST /api/tags/refresh ─────────────────────────────────────────────
+    // POST /api/tags/refresh
 
     [Fact]
     public async Task POST_Refresh_Returns200()
@@ -151,7 +149,7 @@ public sealed class TagsEndpointsTests : IClassFixture<ApiFactory>
         body!.FetchedCount.Should().Be(1000);
     }
 
-    // ── OpenAPI ────────────────────────────────────────────────────────────
+    // OpenAPI
 
     [Fact]
     public async Task GET_OpenApi_Returns200()
