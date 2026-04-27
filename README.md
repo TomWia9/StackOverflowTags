@@ -5,7 +5,7 @@ Full-stack app built with **.NET 10 Minimal API + Clean Architecture + CQRS/Medi
 ## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/stackoverflow-tags.git
+git clone https://github.com/TomWia9/stackoverflow-tags.git
 cd stackoverflow-tags
 docker compose up --build
 ```
