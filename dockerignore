@@ -1,0 +1,21 @@
+# Exclude local build artifacts — these contain Windows-specific paths
+# that break dotnet restore inside the Linux container
+**/bin/
+**/obj/
+
+# Node
+**/node_modules/
+**/.angular/
+
+# Git
+.git/
+.gitignore
+
+# Tests (not needed in backend image)
+tests/
+
+# Misc
+**/*.user
+**/.vs/
+README.md
+docker-compose.yml
