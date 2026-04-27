@@ -1,0 +1,183 @@
+<div class="shell">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">⬡</span>
+      <div>
+        <h1 class="brand-title">Stack Overflow Tags Explorer</h1>
+        @if (!store.isLoading()) {
+          <p class="brand-sub">
+            {{ store.totalCount() | number }} tags indexed
+          </p>
+        }
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="page-size-wrap">
+        Show
+        <select
+          class="page-size-select"
+          [ngModel]="store.pageSize()"
+          (ngModelChange)="store.setPageSize($event)"
+        >
+          @for (opt of pageSizeOptions; track opt) {
+            <option [value]="opt">{{ opt }}</option>
+          }
+        </select>
+        per page
+      </label>
+
+      <button
+        class="btn-refresh"
+        (click)="store.refresh()"
+        [disabled]="store.isRefreshing() || store.isLoading()"
+      >
+        <span class="refresh-icon" [class.spin]="store.isRefreshing()">↻</span>
+        {{
+          store.isRefreshing() ? "Refreshing…" : "Refresh from Stack Overflow"
+        }}
+      </button>
+
+      <a
+        class="btn-docs"
+        [href]="docsUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        API Docs (Scalar)
+      </a>
+    </div>
+  </header>
+
+  <!-- Status banners -->
+  @if (store.refreshMsg()) {
+    <div class="banner banner-ok">{{ store.refreshMsg() }}</div>
+  }
+  @if (store.error()) {
+    <div class="banner banner-err">{{ store.error() }}</div>
+  }
+
+  <!-- Table -->
+  <div class="table-wrap" [class.dimmed]="store.isLoading()">
+    <table class="tags-table">
+      <thead>
+        <tr>
+          <th class="th-rank">#</th>
+
+          <th class="th-name th-sortable" (click)="sort('name')">
+            <span [class.sort-active]="isSortActive('name')">Tag</span>
+            <span class="sort-btn">{{ sortIcon("name") }}</span>
+          </th>
+
+          <th class="th-count">Questions</th>
+
+          <th class="th-pct th-sortable" (click)="sort('percentage')">
+            <span [class.sort-active]="isSortActive('percentage')"
+              >Share&nbsp;%</span
+            >
+            <span class="sort-btn">{{ sortIcon("percentage") }}</span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (store.isLoading()) {
+          <tr>
+            <td colspan="5" class="loading-cell">
+              <span class="spinner"></span>
+              <span>Loading tags…</span>
+            </td>
+          </tr>
+        } @else if (store.tags().length === 0) {
+          <tr>
+            <td colspan="5" class="empty-cell">No tags found.</td>
+          </tr>
+        } @else {
+          @for (tag of store.tags(); track tag.name; let i = $index) {
+            <tr class="tag-row">
+              <td class="td-rank">{{ rowRank(i) }}</td>
+
+              <td class="td-name">
+                <a
+                  class="tag-link"
+                  [href]="
+                    'https://stackoverflow.com/questions/tagged/' + tag.name
+                  "
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="tag-badge">{{ tag.name }}</span>
+                </a>
+              </td>
+
+              <td class="td-count">{{ tag.count | number }}</td>
+
+              <td class="td-pct">{{ tag.percentage | number: "1.4-4" }}%</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (store.totalPages() > 1) {
+    <nav class="pagination" aria-label="Page navigation">
+      <button
+        class="page-btn nav-btn"
+        (click)="store.setPage(1)"
+        [disabled]="store.page() === 1"
+        aria-label="First page"
+      >
+        «
+      </button>
+
+      <button
+        class="page-btn nav-btn"
+        (click)="store.setPage(store.page() - 1)"
+        [disabled]="store.page() === 1"
+        aria-label="Previous page"
+      >
+        ‹
+      </button>
+
+      @for (p of visiblePages(); track p) {
+        @if (p < 0) {
+          <span class="page-ellipsis">…</span>
+        } @else {
+          <button
+            class="page-btn"
+            [class.active]="p === store.page()"
+            (click)="store.setPage(p)"
+            [attr.aria-current]="p === store.page() ? 'page' : null"
+          >
+            {{ p }}
+          </button>
+        }
+      }
+
+      <button
+        class="page-btn nav-btn"
+        (click)="store.setPage(store.page() + 1)"
+        [disabled]="store.page() === store.totalPages()"
+        aria-label="Next page"
+      >
+        ›
+      </button>
+
+      <button
+        class="page-btn nav-btn"
+        (click)="store.setPage(store.totalPages())"
+        [disabled]="store.page() === store.totalPages()"
+        aria-label="Last page"
+      >
+        »
+      </button>
+
+      <span class="page-info"
+        >Page {{ store.page() }} / {{ store.totalPages() }}</span
+      >
+    </nav>
+  }
+</div>

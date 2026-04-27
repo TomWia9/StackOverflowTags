@@ -1,0 +1,49 @@
+:root {
+  --bg:         #09090b;
+  --surface:    #111113;
+  --surface2:   #18181b;
+  --surface3:   #1f1f23;
+  --border:     #27272a;
+  --border2:    #3f3f46;
+  --accent:     #f48024;
+  --accent-dim: rgba(244,128,36,.15);
+  --accent-glow:rgba(244,128,36,.35);
+  --text:       #fafafa;
+  --text-2:     #a1a1aa;
+  --text-3:     #52525b;
+  --success:    #4ade80;
+  --error:      #f87171;
+  --mono: 'Geist Mono', 'Fira Code', monospace;
+  --sans: 'Geist', 'Inter', sans-serif;
+  --radius-sm: 4px;
+  --radius:    8px;
+  --radius-lg: 12px;
+  --shadow: 0 0 0 1px var(--border);
+  --transition: 150ms cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(244,128,36,.06) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(99,102,241,.04) 0%, transparent 60%);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { cursor: pointer; font-family: inherit; }
+a { color: var(--accent); text-decoration: none; }
+
+::selection { background: var(--accent-dim); color: var(--text); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
